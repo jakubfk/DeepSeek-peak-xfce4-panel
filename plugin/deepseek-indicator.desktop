@@ -1,0 +1,12 @@
+[Xfce Panel]
+Type=X-XFCE-PanelPlugin
+Encoding=UTF-8
+Name=DeepSeek Indicator
+Name[pl]=Wskaźnik DeepSeek
+Comment=DeepSeek API peak-hours indicator
+Comment[pl]=Wskaźnik godzin szczytu API DeepSeek
+Icon=network-workgroup
+X-XFCE-Module=deepseek-indicator
+X-XFCE-Internal=false
+X-XFCE-API=2.0
+X-XFCE-Unique=false
