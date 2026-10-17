@@ -26,24 +26,6 @@ Wszystkie pozostałe godziny, weekendy oraz daty z
 `~/.config/xfce4/deepseek-indicator/holidays.txt` są traktowane jako
 off-peak. Prawy klik: cennik DeepSeek, odświeżenie, „O programie”.
 
-## Dlaczego wcześniejsza wersja nie działała
-
-Panel Xfce (4.16+) **nie obsługuje już `X-XFCE-Exec`** — to mechanizm
-zewnętrznych wtyczek GtkPlug/GtkSocket z Xfce 4.4–4.12. Współczesny panel
-czyta wyłącznie `X-XFCE-Module` i ładuje moduł `.so` przez `GModule`,
-szukając symbolu `xfce_panel_module_init` lub `xfce_panel_module_construct`.
-Wpis `.desktop` bez `X-XFCE-Module` jest pomijany **cicho** — dlatego wtyczka
-nigdy nie pojawiała się na liście „Dodaj nowe elementy”, niezależnie od
-liczby restartów panelu. Skryptu w Pythonie nie da się też załadować jako
-moduł panelu: PyGObject nie eksportuje wymaganych symboli C.
-
-Ta wersja to prawdziwy moduł panelu w C (`deepseek-indicator.c`),
-rejestrowany przez `XFCE_PANEL_PLUGIN_REGISTER()` i ładowany symbolem
-`xfce_panel_module_construct`. Wymaga panelu **4.16+** (API 2.0/GTK3);
-starsze 4.14 odrzuci wpis z komunikatem o API 1.0. `X-XFCE-Internal=false`
-znaczy „uruchom moduł w osobnym procesie (wrapper)” — to normalne,
-panel sam nim zarządza.
-
 ## Wymagania
 
 Debian/Ubuntu:
