@@ -108,6 +108,18 @@ plugin/Makefile                      # build + make test
 install.sh                           # build + install user/system/uninstall
 ```
 
+### License
+
+This project is open source, released under the **Apache License 2.0**.
+See the [LICENSE](LICENSE) file for the full text.
+
+You may use, modify, and redistribute this software, including for commercial
+purposes, provided you comply with the license terms: keep the copyright,
+license, and attribution notices, include a copy of the license, state
+significant changes, and do not use the project's trademarks to imply
+endorsement. The license also grants an express patent license from
+contributors.
+
 ### Disclaimer
 
 This is an unofficial, community-made project. It is **not affiliated with,
@@ -239,6 +251,18 @@ plugin/deepseek-indicator.desktop    # wpis X-XFCE-Module=deepseek-indicator
 plugin/Makefile                      # build + make test
 install.sh                           # build + instalacja user/system/uninstall
 ```
+
+### Licencja
+
+Projekt jest otwartoźródłowy i udostępniany na **licencji Apache 2.0**.
+Pełny tekst znajduje się w pliku [LICENSE](LICENSE).
+
+Możesz używać, modyfikować i redystrybuować to oprogramowanie, również
+komercyjnie, pod warunkiem zachowania warunków licencji: zachowania informacji
+o prawach autorskich, licencji i autorstwie, dołączenia kopii licencji,
+wskazania istotnych zmian oraz nieużywania znaków towarowych projektu
+w sposób sugerujący poparcie. Licencja zawiera też wyraźny grant patentowy
+od współtwórców.
 
 ### Zastrzeżenia prawne
 
