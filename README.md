@@ -108,6 +108,30 @@ plugin/Makefile                      # build + make test
 install.sh                           # build + install user/system/uninstall
 ```
 
+### Disclaimer
+
+This is an unofficial, community-made project. It is **not affiliated with,
+endorsed by, sponsored by, or in any other way connected to** DeepSeek
+(Hangzhou DeepSeek Artificial Intelligence Basic Technology Research Co., Ltd.)
+or any of its affiliates, subsidiaries, or partners.
+
+"DeepSeek" and all related names, logos, and trademarks are the property of
+their respective owners. The name is used here **solely for informational and
+descriptive purposes** — to state what the tool displays (the publicly
+documented peak-hour schedule of the DeepSeek API) — in a nominative way. The
+author claims **no rights whatsoever** to the name, logo, or brand, and no
+endorsement or partnership is implied.
+
+All product and company names mentioned are trademarks or registered
+trademarks of their respective holders. Peak-hour windows, pricing, and the
+API itself may change at any time and without notice; this tool is not an
+official source of truth — always verify against the official DeepSeek
+documentation.
+
+The software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose and noninfringement.
+
 ---
 
 ## Polski
@@ -215,3 +239,27 @@ plugin/deepseek-indicator.desktop    # wpis X-XFCE-Module=deepseek-indicator
 plugin/Makefile                      # build + make test
 install.sh                           # build + instalacja user/system/uninstall
 ```
+
+### Zastrzeżenia prawne
+
+To nieoficjalny, społecznościowy projekt. **Nie jest powiązany, sponsorowany,
+autoryzowany ani w żaden inny sposób związany** z DeepSeek (Hangzhou DeepSeek
+Artificial Intelligence Basic Technology Research Co., Ltd.) ani z jej
+podmiotami powiązanymi, spółkami zależnymi lub partnerami.
+
+„DeepSeek” oraz wszystkie powiązane nazwy, logotypy i znaki towarowe należą do
+ich właścicieli. Nazwa jest tu używana **wyłącznie w celach informacyjnych
+i opisowych** — aby wskazać, co prezentuje narzędzie (publicznie udokumentowany
+harmonogram godzin szczytu API DeepSeek) — w sposób nominatywny. Autor **nie
+roszczy sobie żadnych praw** do nazwy, logo ani marki; użycie nazwy nie oznacza
+poparcia, współpracy ani partnerstwa.
+
+Wszystkie wymienione nazwy produktów i firm są znakami towarowymi lub
+zastrzeżonymi znakami towarowymi ich właścicieli. Godziny szczytu, cennik oraz
+samo API mogą się zmienić w każdej chwili i bez powiadomienia; to narzędzie nie
+jest oficjalnym źródłem informacji — zawsze weryfikuj dane w oficjalnej
+dokumentacji DeepSeek.
+
+Oprogramowanie dostarczane jest „tak jak jest”, bez jakiejkolwiek gwarancji,
+dorozumianej lub wyraźnej, w tym bez gwarancji przydatności handlowej,
+przydatności do określonego celu i nienaruszania praw osób trzecich.
