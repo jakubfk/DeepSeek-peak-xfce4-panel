@@ -275,7 +275,7 @@ podmiotami powiązanymi, spółkami zależnymi lub partnerami.
 ich właścicieli. Nazwa jest tu używana **wyłącznie w celach informacyjnych
 i opisowych** — aby wskazać, co prezentuje narzędzie (publicznie udokumentowany
 harmonogram godzin szczytu API DeepSeek) — w sposób nominatywny. Autor **nie
-roszczy sobie żadnych praw** do nazwy, logo ani marki; użycie nazwy nie oznacza
+rości sobie żadnych praw** do nazwy, logo ani marki; użycie nazwy nie oznacza
 poparcia, współpracy ani partnerstwa.
 
 Wszystkie wymienione nazwy produktów i firm są znakami towarowymi lub
