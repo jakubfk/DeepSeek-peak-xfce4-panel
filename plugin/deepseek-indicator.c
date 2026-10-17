@@ -37,6 +37,72 @@ typedef enum
   DOT_PEAK
 } DotState;
 
+/* ------------------------------------------------------------------ */
+/* translation: no gettext, the wrapper inherits the user's locale     */
+/* ------------------------------------------------------------------ */
+
+enum
+{
+  T_PRICING,
+  T_REFRESH,
+  T_ABOUT,
+  T_STATE_PEAK,
+  T_STATE_SOON,
+  T_STATE_OFFPEAK,
+  T_NEXT_PEAK,
+  T_NEXT_OFFPEAK,
+  T_CHANGE_LINE,
+  T_ABOUT_COMMENT,
+  T_COUNT
+};
+
+static const struct
+{
+  const gchar *pl;
+  const gchar *en;
+} translations[T_COUNT] =
+{
+  [T_PRICING]       = { "Otwórz cennik DeepSeek", "Open DeepSeek pricing" },
+  [T_REFRESH]       = { "Odśwież", "Refresh" },
+  [T_ABOUT]         = { "O programie", "About" },
+  [T_STATE_PEAK]    = { "godziny szczytu", "peak hours" },
+  [T_STATE_SOON]    = { "pozaszczyt, szczyt wkrótce", "off-peak, peak starting soon" },
+  [T_STATE_OFFPEAK] = { "godziny pozaszczytowe", "off-peak hours" },
+  [T_NEXT_PEAK]     = { "szczyt", "peak" },
+  [T_NEXT_OFFPEAK]  = { "pozaszczyt", "off-peak" },
+  [T_CHANGE_LINE]   = { "Zmiana za %s → %s od %s", "Change in %s → %s from %s" },
+  [T_ABOUT_COMMENT] =
+      { "Wskaźnik godzin szczytu DeepSeek API (UTC)\n"
+        "Pon-pt: 01:00-04:00 i 06:00-10:00 UTC\n"
+        "Zielona = pozaszczyt, pomarańczowa = szczyt w ciągu 30 min,\n"
+        "czerwona = szczyt",
+        "DeepSeek API peak-hours indicator (UTC)\n"
+        "Mon-Fri: 01:00-04:00 and 06:00-10:00 UTC\n"
+        "Green = off-peak, orange = peak starts within 30 min,\n"
+        "red = peak" },
+};
+
+static gboolean g_polish = TRUE;
+
+/* Polish only when the user's locale is Polish, otherwise English.
+ * g_get_language_names() honours LANGUAGE/LC_ALL/LC_MESSAGES/LANG. */
+static gboolean
+locale_is_polish (void)
+{
+  const gchar * const *names = g_get_language_names ();
+
+  return names != NULL && names[0] != NULL
+      && g_str_has_prefix (names[0], "pl");
+}
+
+static const gchar *
+tr (guint id)
+{
+  g_return_val_if_fail (id < T_COUNT, "");
+
+  return g_polish ? translations[id].pl : translations[id].en;
+}
+
 typedef struct
 {
   XfcePanelPlugin *plugin;
@@ -246,6 +312,7 @@ deepseek_update (gpointer user_data)
   gchar          *now_stamp;
   gchar          *change_stamp;
   gchar          *duration;
+  gchar          *line;
   gchar          *tip;
   const gchar    *state_text;
   const gchar    *next_text;
@@ -263,10 +330,10 @@ deepseek_update (gpointer user_data)
 
   switch (ds->state)
     {
-    case DOT_PEAK:    state_text = "godziny szczytu"; break;
-    case DOT_SOON:    state_text = "pozaszczyt, szczyt wkrótce"; break;
+    case DOT_PEAK:    state_text = tr (T_STATE_PEAK); break;
+    case DOT_SOON:    state_text = tr (T_STATE_SOON); break;
     case DOT_OFFPEAK:
-    default:          state_text = "godziny pozaszczytowe"; break;
+    default:          state_text = tr (T_STATE_OFFPEAK); break;
     }
 
   if (minutes_left > 0)
@@ -274,13 +341,14 @@ deepseek_update (gpointer user_data)
       change_at    = g_date_time_add_minutes (now, (gint) minutes_left);
       change_stamp = g_date_time_format (change_at, "%d.%m %H:%M UTC");
       duration     = format_duration (minutes_left);
-      next_text    = peak ? "pozaszczyt" : "szczyt";
+      next_text    = peak ? tr (T_NEXT_OFFPEAK) : tr (T_NEXT_PEAK);
 
-      tip = g_strdup_printf ("DeepSeek: %s (%s)\n"
-                             "Zmiana za %s → %s od %s",
-                             state_text, now_stamp,
-                             duration, next_text, change_stamp);
+      line = g_strdup_printf (tr (T_CHANGE_LINE),
+                              duration, next_text, change_stamp);
+      tip  = g_strdup_printf ("DeepSeek: %s (%s)\n%s",
+                              state_text, now_stamp, line);
 
+      g_free (line);
       g_free (change_stamp);
       g_free (duration);
       g_date_time_unref (change_at);
@@ -332,12 +400,8 @@ on_about (GtkMenuItem *item,
 
   dialog = gtk_about_dialog_new ();
   gtk_about_dialog_set_program_name (GTK_ABOUT_DIALOG (dialog), "DeepSeek Status Indicator");
-  gtk_about_dialog_set_version (GTK_ABOUT_DIALOG (dialog), "2.1");
-  gtk_about_dialog_set_comments (GTK_ABOUT_DIALOG (dialog),
-                                 "Wskaźnik godzin szczytu DeepSeek API (UTC)\n"
-                                 "Pon-pt: 01:00-04:00 i 06:00-10:00 UTC\n"
-                                 "Zielona = pozaszczyt, pomarańczowa = szczyt w ciągu 30 min,\n"
-                                 "czerwona = szczyt");
+  gtk_about_dialog_set_version (GTK_ABOUT_DIALOG (dialog), "2.2");
+  gtk_about_dialog_set_comments (GTK_ABOUT_DIALOG (dialog), tr (T_ABOUT_COMMENT));
 
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (ds->plugin));
   if (GTK_IS_WINDOW (toplevel))
@@ -385,6 +449,8 @@ deepseek_construct (XfcePanelPlugin *plugin)
   DeepSeekPlugin *ds;
   GtkWidget      *item;
 
+  g_polish = locale_is_polish ();
+
   ds = g_new0 (DeepSeekPlugin, 1);
   ds->plugin = plugin;
 
@@ -400,17 +466,17 @@ deepseek_construct (XfcePanelPlugin *plugin)
 
   ds->menu = gtk_menu_new ();
 
-  item = gtk_menu_item_new_with_label ("Otwórz cennik DeepSeek");
+  item = gtk_menu_item_new_with_label (tr (T_PRICING));
   g_signal_connect (item, "activate", G_CALLBACK (on_open_pricing), ds);
   gtk_menu_shell_append (GTK_MENU_SHELL (ds->menu), item);
 
-  item = gtk_menu_item_new_with_label ("Odśwież");
+  item = gtk_menu_item_new_with_label (tr (T_REFRESH));
   g_signal_connect (item, "activate", G_CALLBACK (on_refresh), ds);
   gtk_menu_shell_append (GTK_MENU_SHELL (ds->menu), item);
 
   gtk_menu_shell_append (GTK_MENU_SHELL (ds->menu), gtk_separator_menu_item_new ());
 
-  item = gtk_menu_item_new_with_label ("O programie");
+  item = gtk_menu_item_new_with_label (tr (T_ABOUT));
   g_signal_connect (item, "activate", G_CALLBACK (on_about), ds);
   gtk_menu_shell_append (GTK_MENU_SHELL (ds->menu), item);
 
@@ -471,14 +537,14 @@ check (GHashTable  *holidays,
 
   ok = (peak == expect_peak) && (left == expect_left) && (state == expect_state);
 
-  g_print ("%s %04d-%02d-%02d %02d:%02d UTC -> %-7s / zmiana za %4u min / %s: %s\n",
+  g_print ("%s %04d-%02d-%02d %02d:%02d UTC -> %-7s / change in %4u min / %s: %s\n",
            label, year, month, day, hour, minute,
            peak ? "peak" : "off-peak", left,
            state == DOT_PEAK ? "red" : (state == DOT_SOON ? "orange" : "green"),
            ok ? "OK" : "FAIL");
 
   if (!ok)
-    g_print ("  oczekiwano: %-7s / zmiana za %4u min / %s\n",
+    g_print ("  expected:  %-7s / change in %4u min / %s\n",
              expect_peak ? "peak" : "off-peak", expect_left,
              expect_state == DOT_PEAK ? "red"
                : (expect_state == DOT_SOON ? "orange" : "green"));
@@ -495,31 +561,50 @@ main (void)
   int total  = 0;
   gchar *path;
 
+  g_print ("Detected language: %s\n", locale_is_polish () ? "pl" : "en(+other)");
+
   /* peak windows and weekends */
-  total++; passed += check (h, 2025, 1, 20,  0, 59, FALSE,   1, DOT_SOON,   "pon przed 1. oknem");
-  total++; passed += check (h, 2025, 1, 20,  1,  0, TRUE,  180, DOT_PEAK,   "pon start 1. okna");
-  total++; passed += check (h, 2025, 1, 20,  3, 59, TRUE,    1, DOT_PEAK,   "pon koniec 1. okna");
-  total++; passed += check (h, 2025, 1, 20,  4,  0, FALSE, 120, DOT_OFFPEAK, "pon po 1. oknie");
-  total++; passed += check (h, 2025, 1, 20,  6,  0, TRUE,  240, DOT_PEAK,   "pon start 2. okna");
-  total++; passed += check (h, 2025, 1, 20,  9, 45, TRUE,   15, DOT_PEAK,   "pon 15 min do końca szczytu");
-  total++; passed += check (h, 2025, 1, 20, 10,  0, FALSE, 900, DOT_OFFPEAK, "pon po 2. oknie");
-  total++; passed += check (h, 2025, 1, 25,  1,  0, FALSE, 2880, DOT_OFFPEAK, "sobota");
-  total++; passed += check (h, 2025, 1, 26,  7,  0, FALSE, 1080, DOT_OFFPEAK, "niedziela");
+  total++; passed += check (h, 2025, 1, 20,  0, 59, FALSE,   1, DOT_SOON,   "Mon before peak 1");
+  total++; passed += check (h, 2025, 1, 20,  1,  0, TRUE,  180, DOT_PEAK,   "Mon peak 1 start");
+  total++; passed += check (h, 2025, 1, 20,  3, 59, TRUE,    1, DOT_PEAK,   "Mon peak 1 end");
+  total++; passed += check (h, 2025, 1, 20,  4,  0, FALSE, 120, DOT_OFFPEAK, "Mon after peak 1");
+  total++; passed += check (h, 2025, 1, 20,  6,  0, TRUE,  240, DOT_PEAK,   "Mon peak 2 start");
+  total++; passed += check (h, 2025, 1, 20,  9, 45, TRUE,   15, DOT_PEAK,   "Mon 15 min before peak end");
+  total++; passed += check (h, 2025, 1, 20, 10,  0, FALSE, 900, DOT_OFFPEAK, "Mon after peak 2");
+  total++; passed += check (h, 2025, 1, 25,  1,  0, FALSE, 2880, DOT_OFFPEAK, "Saturday");
+  total++; passed += check (h, 2025, 1, 26,  7,  0, FALSE, 1080, DOT_OFFPEAK, "Sunday");
 
   /* orange warning window: only for green -> red */
-  total++; passed += check (h, 2025, 1, 20,  0, 30, FALSE,  30, DOT_OFFPEAK, "30 min do zmiany (bez ostrzeżenia)");
-  total++; passed += check (h, 2025, 1, 20,  0, 31, FALSE,  29, DOT_SOON,   "29 min do zmiany (ostrzeżenie)");
-  total++; passed += check (h, 2025, 1, 20,  0, 29, FALSE,  31, DOT_OFFPEAK, "31 min do zmiany");
+  total++; passed += check (h, 2025, 1, 20,  0, 30, FALSE,  30, DOT_OFFPEAK, "30 min to change (no warning)");
+  total++; passed += check (h, 2025, 1, 20,  0, 31, FALSE,  29, DOT_SOON,   "29 min to change (warning)");
+  total++; passed += check (h, 2025, 1, 20,  0, 29, FALSE,  31, DOT_OFFPEAK, "31 min to change");
 
   /* holidays */
-  total++; passed += check (h, 2025, 1, 29,  2,  0, FALSE, 1380, DOT_OFFPEAK, "święto w środku szczytu");
-  total++; passed += check (h, 2025, 1, 28, 23, 59, FALSE, 1501, DOT_OFFPEAK, "dzień przed świętem");
+  total++; passed += check (h, 2025, 1, 29,  2,  0, FALSE, 1380, DOT_OFFPEAK, "holiday inside peak");
+  total++; passed += check (h, 2025, 1, 28, 23, 59, FALSE, 1501, DOT_OFFPEAK, "day before holiday");
 
   /* long off-peak stretch: Fri 10:00 -> Mon 01:00 */
-  total++; passed += check (h, 2025, 1, 24, 10,  0, FALSE, 3780, DOT_OFFPEAK, "piątek po 2. oknie");
+  total++; passed += check (h, 2025, 1, 24, 10,  0, FALSE, 3780, DOT_OFFPEAK, "Friday after peak 2");
+
+  /* every string must exist in both languages */
+  {
+    guint i;
+
+    for (i = 0; i < T_COUNT; i++)
+      {
+        gboolean ok = translations[i].pl != NULL && translations[i].en != NULL
+                   && *translations[i].pl != '\0' && *translations[i].en != '\0';
+
+        total++;
+        if (ok)
+          passed++;
+        else
+          g_print ("FAIL: missing translation for id %u\n", i);
+      }
+  }
 
   path = holidays_path ();
-  g_print ("\nPlik świąt: %s\n", path);
+  g_print ("\nHolidays file: %s\n", path);
   g_free (path);
 
   g_hash_table_destroy (h);
